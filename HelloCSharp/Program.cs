@@ -188,144 +188,181 @@ namespace BrainFuckInterpreter
             }
 
 
-            char[] chars = System.Text.Encoding.UTF8.GetChars(fileBuffer);
 
+            cmds[] cmd_arr;
+            {
+                char[] chars = System.Text.Encoding.UTF8.GetChars(fileBuffer);
+                cmd_arr = new cmds[chars.Length];
+                int counter = 0;
+                foreach (char item in chars)
+                {
+                    switch (item)
+                    {
+                        case '>':
+                            cmd_arr[counter++] = cmds.ptr_inc;
+                            continue;
+                        case '<':
+                            cmd_arr[counter++] = cmds.ptr_dec;
+                            continue;
+                        case '+':
+                            cmd_arr[counter++] = cmds.dat_inc;
+                            continue;
+                        case '-':
+                            cmd_arr[counter++] = cmds.dat_dec;
+                            continue;
+                        case '.':
+                            cmd_arr[counter++] = cmds.output;
+                            continue;
+                        case ',':
+                            cmd_arr[counter++] = cmds.input;
+                            continue;
+                        case '[':
+                            cmd_arr[counter++] = cmds.left;
+                            continue;
+                        case ']':
+                            cmd_arr[counter++] = cmds.right;
+                            continue;
+                        default:
+                            continue;
+                    }
+                }
+
+            }
+        
            
+
 
 
 
         //Console.WriteLine(chars);
         int cmd_index = 0;
-            int[] tape = new int[tape_length];
-            for (int i = 0; i < tape_length; i++)
-            {
-                tape[i] = 0;
-            }
-            Array.Clear(tape, 0, tape.Length);
-            int mem_index = 0;
-            char currChar;
+        int[] tape = new int[tape_length];
+        for (int i = 0; i < tape_length; i++)
+        {
+            tape[i] = 0;
+        }
+        Array.Clear(tape, 0, tape.Length);
+        int mem_index = 0;
+        char currChar;
+            Console.Write("done prepping");
+
             while (true)
+        {
+            if(cmd_index >= cmd_arr.Length)
             {
-                if(cmd_index >= chars.Length - 1)
-                {
-                    break;
-                }
-                currChar = chars[cmd_index];
-               // Console.WriteLine($"char: {currChar}");
-
-                /*
-                 * >	increment the data pointer (to point to the next cell to the right).
-                 * <	decrement the data pointer (to point to the next cell to the left).
-                 * +	increment (increase by one) the byte at the data pointer.
-                 * -	decrement (decrease by one) the byte at the data pointer.
-                 * .	output the byte at the data pointer.
-                 * ,	accept one byte of input, storing its value in the byte at the data pointer.
-                 * [	if the byte at the data pointer is zero, then instead of moving the instruction pointer forward to the next command, jump it forward to the command after the matching ] command.
-                 * ]	if the byte at the data pointer is nonzero, then instead of moving the instruction pointer forward to the next command, jump it back to the command after the matching [ command.
-                */
-                switch (currChar)
-                {
-                    case '>':
-                        Debug("inc_ptr");
-                        mem_index++;
-                        cmd_index += 1;
-                        break;
-                    case '<':
-                        mem_index--;
-                        cmd_index += 1;
-                        break;
-                    case '+':
-                        tape[mem_index] = ((tape[mem_index]) + 1);
-                        cmd_index += 1;
-                        break;
-                    case '-':
-                        tape[mem_index] = ((tape[mem_index]) - 1);
-                        cmd_index += 1;
-                        break;
-                    case '.':
-
-                        Console.Write(asciiSymbol((byte)(tape[mem_index])));
-                        //   Console.Write($"{(char)(tape[mem_index] + 96)}\n");
-                        cmd_index += 1;
-                        break;
-                    case ',':
-                        tape[mem_index] = (int)Console.ReadKey().KeyChar;
-                        cmd_index += 1;
-                        Console.ReadLine();
-                        break;
-                    case '[':
-                        if (tape[mem_index] == 0)
-                        {
-                            char current;
-                            bool run = true;
-                            int bracketCounter = 0;
-                            while (run)
-                            {
-                                cmd_index += 1;
-                                current = chars[cmd_index];
-                                switch (current)
-                                {
-                                    case '[':
-                                        bracketCounter += 1;
-                                        continue;
-                                    case ']':
-                                        if (bracketCounter <= 0)
-                                        {
-                                            cmd_index += 1;
-                                            run = false;
-                                        }
-                                        else                                         bracketCounter -= 1;
-                                        continue;
-                                    default:
-                                        continue;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            cmd_index += 1;
-                        }
-                        break;
-                    case ']':
-                        // ]	if the byte at the data pointer is nonzero, then instead of moving the instruction pointer forward to the next command, jump it back to the command after the matching[command.
-                        //Console.WriteLine($"Gonn a get index {mem_index}");
-                        if (tape[mem_index] != 0)
-                        {
-                            char current;
-                            bool run = true;
-                            int bracketCounter = 0;
-                            while (run)
-                            {
-                                cmd_index -= 1;
-                                current = chars[cmd_index];
-                                switch (current)
-                                {
-                                    case '[':
-                                        if (bracketCounter <= 0)
-                                        {
-                                            cmd_index -= 1;
-                                            run = false;
-                                        }
-                                        else bracketCounter -= 1;
-                                        continue;
-                                    case ']':
-                                        bracketCounter += 1;
-                                        continue;
-                                    default:
-                                        continue;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            cmd_index += 1;
-                        }
-                        break;
-                    default:
-                        cmd_index += 1;
-                        break;
-                }
+                break;
             }
+
+            /*
+                * >	increment the data pointer (to point to the next cell to the right).
+                * <	decrement the data pointer (to point to the next cell to the left).
+                * +	increment (increase by one) the byte at the data pointer.
+                * -	decrement (decrease by one) the byte at the data pointer.
+                * .	output the byte at the data pointer.
+                * ,	accept one byte of input, storing its value in the byte at the data pointer.
+                * [	if the byte at the data pointer is zero, then instead of moving the instruction pointer forward to the next command, jump it forward to the command after the matching ] command.
+                * ]	if the byte at the data pointer is nonzero, then instead of moving the instruction pointer forward to the next command, jump it back to the command after the matching [ command.
+            */
+            switch (cmd_arr[cmd_index]){
+                case cmds.ptr_inc:
+                    Debug("inc_ptr");
+                    mem_index += 1;
+                    cmd_index += 1;
+                    break;
+                case cmds.ptr_dec:
+                    mem_index -= 1;
+                    cmd_index += 1;
+                    break;
+                case cmds.dat_inc:
+                    tape[mem_index] += 1;
+                    cmd_index += 1;
+                    break;
+                case cmds.dat_dec:
+                    tape[mem_index] -= 1;
+                    cmd_index += 1;
+                    break;
+                    case cmds.output:
+                    Console.Write(asciiSymbol((byte)(tape[mem_index])));
+                    cmd_index += 1;
+                    break;
+                case cmds.input:
+                    tape[mem_index] = (int)Console.ReadKey().KeyChar;
+                    cmd_index += 1;
+                    Console.ReadLine();
+                    break;
+                case cmds.left:
+                    if (tape[mem_index] == 0)
+                    {
+                        cmds current;
+                        bool run = true;
+                        int bracketCounter = 0;
+                        while (run)
+                        {
+                            cmd_index += 1;
+                            current = cmd_arr[cmd_index];
+                            switch (current)
+                            {
+                                case cmds.left:
+                                    bracketCounter += 1;
+                                        break;
+                                    case cmds.right:
+                                    if (bracketCounter <= 0)
+                                    {
+                                        cmd_index += 1;
+                                        run = false;
+                                    }
+                                    else                                         bracketCounter -= 1;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                        }
+                    }
+                    else
+                    {
+                        cmd_index += 1;
+                    }
+                    break;
+                case cmds.right:
+                    // ]	if the byte at the data pointer is nonzero, then instead of moving the instruction pointer forward to the next command, jump it back to the command after the matching[command.
+                    //Console.WriteLine($"Gonn a get index {mem_index}");
+                    if (tape[mem_index] != 0)
+                    {
+                            cmds current;
+                        bool run = true;
+                        int bracketCounter = 0;
+                        while (run)
+                        {
+                            cmd_index -= 1;
+                            current = cmd_arr[cmd_index];
+                            switch (current)
+                            {
+                                case cmds.left:
+                                    if (bracketCounter <= 0)
+                                    {
+                                        cmd_index -= 1;
+                                        run = false;
+                                    }
+                                    else bracketCounter -= 1;
+                                        break;
+                                    case cmds.right:
+                                    bracketCounter += 1;
+                                        break;
+                                    default:
+                                        break ;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        cmd_index += 1;
+                    }
+                    break;
+                default:
+                        Console.Write("ERROR\n");
+                        break;
+            }
+        }
 
 
 
