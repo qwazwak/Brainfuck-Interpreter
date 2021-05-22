@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HelloCSharp
+namespace BrainFuckInterpreter
 {
     class Program
     {
@@ -14,8 +14,10 @@ namespace HelloCSharp
             if(args.Length == 0)
             {
                 bool havePath = false;
+                string input = "";
+                int counter = 0;
                 Console.Write("No arguments were entered\nEnter the path to the BrainFuck source file: ");
-                while (havePath)
+                while (!havePath)
                 {
                     if (Console.KeyAvailable)
                     {
@@ -28,11 +30,14 @@ namespace HelloCSharp
                              default:
                                  break;
                          }*/
-                        string input = Console.ReadLine();
+                        input = Console.ReadLine();
+                        Console.WriteLine($"{input}");
+                        Console.WriteLine($"Counter: {counter}");
+
                     }
+                    counter += 1;
                 }
 
-                Console.WriteLine($"You are {input} years old!");
             }
             Console.Write("Hello\n");
             Console.Write("2nd line");
